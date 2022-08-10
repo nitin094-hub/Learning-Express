@@ -27,11 +27,22 @@ const Tour = require("../models/tourModel");
 
 exports.getAllTours = async (req, res) => {
   try {
-    const allTours = await Tour.find();
+    // Filtering
+    const queryObj = { ...req.query };
+    const exculdeArr = ["sort", "limit", "page", "fields"];
+    exculdeArr.forEach((item) => delete queryObj[item]);
+    let query = Tour.find({ queryObj });
 
+    // Sorting
+    if (req.query.sort) {
+      query = query.sort(req.query.sort);
+    }
+    console.log(req.query.sort);
+    const allTours = await query;
     res.status(200).send({
       status: "success",
       requestTime: req.requestTime,
+      results: allTours.length,
       data: {
         allTours,
       },
