@@ -37,7 +37,25 @@ exports.getAllTours = async (req, res) => {
     if (req.query.sort) {
       query = query.sort(req.query.sort);
     }
-    console.log(req.query.sort);
+
+    // Limiting
+
+    if (req.query.fields) {
+      const fields = req.query.fields.split(",").join(" ");
+      console.log(fields);
+      query = query.select(fields);
+    } else {
+      query = query.select("-__v");
+    }
+
+    // Pagination
+
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
     const allTours = await query;
     res.status(200).send({
       status: "success",
