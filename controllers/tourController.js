@@ -1,6 +1,6 @@
 // const fs = require("fs");
 const Tour = require("../models/tourModel");
-
+const ApiFeatures = require("../utils/apiFeatures");
 // const tours = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // );
@@ -25,38 +25,50 @@ const Tour = require("../models/tourModel");
 //   next();
 // };
 
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = 5;
+  req.query.sort = "-ratingAverage price";
+  next();
+};
+
 exports.getAllTours = async (req, res) => {
   try {
     // Filtering
-    const queryObj = { ...req.query };
-    const exculdeArr = ["sort", "limit", "page", "fields"];
-    exculdeArr.forEach((item) => delete queryObj[item]);
-    let query = Tour.find({ queryObj });
+    // const queryObj = { ...req.query };
+    // const exculdeArr = ["sort", "limit", "page", "fields"];
+    // exculdeArr.forEach((item) => delete queryObj[item]);
+    // let query = Tour.find(queryObj);
 
     // Sorting
-    if (req.query.sort) {
-      query = query.sort(req.query.sort);
-    }
+    // if (req.query.sort) {
+    //   query = query.sort(req.query.sort);
+    // }
 
-    // Limiting
+    // // Limiting
 
-    if (req.query.fields) {
-      const fields = req.query.fields.split(",").join(" ");
-      console.log(fields);
-      query = query.select(fields);
-    } else {
-      query = query.select("-__v");
-    }
+    // if (req.query.fields) {
+    //   const fields = req.query.fields.split(",").join(" ");
+    //   console.log(fields);
+    //   query = query.select(fields);
+    // } else {
+    //   query = query.select("-__v");
+    // }
 
-    // Pagination
+    // // Pagination
 
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 100;
-    const skip = (page - 1) * limit;
+    // const page = req.query.page * 1 || 1;
+    // const limit = req.query.limit * 1 || 100;
+    // const skip = (page - 1) * limit;
 
-    query = query.skip(skip).limit(limit);
+    // query = query.skip(skip).limit(limit);
 
-    const allTours = await query;
+    const features = new ApiFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limit()
+      .pagination();
+
+    const allTours = await features.query;
     res.status(200).send({
       status: "success",
       requestTime: req.requestTime,
@@ -200,6 +212,74 @@ exports.deleteTour = async (req, res) => {
     res.status(204).send({
       status: "success",
       data: null,
+    });
+  } catch (err) {
+    res.status(400).send({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: "$difficulty",
+          numTours: { $sum: 1 },
+          numRating: { $sum: "$ratingsQuantity" },
+          avgRating: { $avg: "$ratingsAverage" },
+          avgPrice: { $avg: "$price" },
+          minPrice: { $min: "$price" },
+          maxPrice: { $max: "$price" },
+        },
+      },
+    ]);
+    res.status(200).send({
+      status: "success",
+      data: { stats },
+    });
+  } catch (err) {
+    res.status(400).send({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1;
+    const plan = await Tour.aggregate([
+      {
+        $unwind: "$startDates",
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+
+      {
+        $group: {
+          _id: { $month: "$startDates" },
+          numToursStart: { $sum: 1 },
+          tours: { $push: "$name" },
+        },
+      },
+    ]);
+    res.status(200).send({
+      status: "success",
+      data: {
+        plan,
+      },
     });
   } catch (err) {
     res.status(400).send({
