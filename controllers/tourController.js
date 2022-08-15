@@ -31,7 +31,7 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = async (req, res) => {
+exports.getAllTours = async (req, res, next) => {
   try {
     // Filtering
     // const queryObj = { ...req.query };
@@ -78,14 +78,11 @@ exports.getAllTours = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).send({
-      status: "fail",
-      message: err.message,
-    });
+    next(err);
   }
 };
 
-exports.createTour = async (req, res) => {
+exports.createTour = async (req, res, next) => {
   // const tourId = tours[tours.length - 1].id + 1;
   // const changedIdTour = {
   //   ...req.body,
@@ -114,10 +111,7 @@ exports.createTour = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).send({
-      status: "fail",
-      message: err.message,
-    });
+    next(err);
   }
 };
 
@@ -138,10 +132,7 @@ exports.getTourById = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).send({
-      status: "fail",
-      message: err.message,
-    });
+    next(err);
   }
 };
 
@@ -184,10 +175,7 @@ exports.updateTour = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).send({
-      status: "fail",
-      message: err.message,
-    });
+    next(err);
   }
 };
 
@@ -214,10 +202,7 @@ exports.deleteTour = async (req, res) => {
       data: null,
     });
   } catch (err) {
-    res.status(400).send({
-      status: "fail",
-      message: err.message,
-    });
+    next(err);
   }
 };
 
@@ -244,10 +229,7 @@ exports.getTourStats = async (req, res) => {
       data: { stats },
     });
   } catch (err) {
-    res.status(400).send({
-      status: "fail",
-      message: err.message,
-    });
+    next(err);
   }
 };
 
@@ -282,9 +264,6 @@ exports.getMonthlyPlan = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).send({
-      status: "fail",
-      message: err.message,
-    });
+    next(err);
   }
 };

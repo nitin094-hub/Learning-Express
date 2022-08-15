@@ -5,7 +5,7 @@ const app = require("./app");
 
 const db = process.env.DATABASE;
 
-mongoose.connect(db).then((con) => {
+mongoose.connect(db).then(() => {
   console.log("DB CONNECTED");
 });
 
