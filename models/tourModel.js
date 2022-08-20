@@ -116,7 +116,8 @@ const tourScheme = new mongoose.Schema({
 });
 
 tourScheme.pre("save", async function (next) {
-  const guidesPromise = this.guide.map(async (id) => await User.findbyId(id));
+  console.log(this.guides);
+  const guidesPromise = this.guides.map(async (id) => await User.findById(id));
   this.guides = await Promise.all(guidesPromise);
   next();
 });
