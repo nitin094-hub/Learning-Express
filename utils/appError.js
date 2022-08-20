@@ -6,7 +6,7 @@ function AppError(message, statusCode, stack = null) {
     const err = new Error(this.message);
     err.status = "fail";
     err.statusCode = this.statusCode;
-    Error.captureStackTrace(stack);
+    console.log(err);
     return err;
   };
 }

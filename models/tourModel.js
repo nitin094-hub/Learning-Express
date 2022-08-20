@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
+const User = require("../models/userModel");
 
 const tourScheme = new mongoose.Schema({
   name: {
@@ -88,6 +89,36 @@ const tourScheme = new mongoose.Schema({
     default: Date.now(),
   },
   startDates: [Date],
+  startLocation: {
+    type: {
+      type: String,
+      default: "Point",
+      enum: ["Point"],
+    },
+    coordinates: [Number],
+    adress: String,
+    description: String,
+  },
+  locations: [
+    {
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      adress: String,
+      description: String,
+      day: Number,
+    },
+  ],
+  guides: Array,
+});
+
+tourScheme.pre("save", async function (next) {
+  const guidesPromise = this.guide.map(async (id) => await User.findbyId(id));
+  this.guides = await Promise.all(guidesPromise);
+  next();
 });
 
 // Document middleWare
