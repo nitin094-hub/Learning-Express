@@ -112,15 +112,22 @@ const tourScheme = new mongoose.Schema({
       day: Number,
     },
   ],
-  guides: Array,
+  guides: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
-tourScheme.pre("save", async function (next) {
-  console.log(this.guides);
-  const guidesPromise = this.guides.map(async (id) => await User.findById(id));
-  this.guides = await Promise.all(guidesPromise);
-  next();
-});
+// Embedding Data
+
+// tourScheme.pre("save", async function (next) {
+//   console.log(this.guides);
+//   const guidesPromise = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromise);
+//   next();
+// });
 
 // Document middleWare
 
@@ -137,6 +144,14 @@ tourScheme.pre("save", function (next) {
 
 tourScheme.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+tourScheme.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v",
+  });
   next();
 });
 

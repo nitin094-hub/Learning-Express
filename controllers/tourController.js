@@ -67,7 +67,6 @@ exports.getAllTours = async (req, res, next) => {
       .sort()
       .limit()
       .pagination();
-
     const allTours = await features.query;
     res.status(200).send({
       status: "success",
@@ -115,7 +114,7 @@ exports.createTour = async (req, res, next) => {
   }
 };
 
-exports.getTourById = async (req, res) => {
+exports.getTourById = async (req, res, next) => {
   const id = req.params.id;
   // const filteredTour = tours.filter((item) => item.id === id)[0];
   // res.status(200).send({
