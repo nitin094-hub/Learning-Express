@@ -19,6 +19,11 @@ const reviewScheme = new mongoose.Schema({
     ref: "Tour",
     require: [true, "Review must belong to a tour"],
   },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    required: [true, "Review must belong to a user."],
+  },
 });
 
 module.exports = reviewScheme;
