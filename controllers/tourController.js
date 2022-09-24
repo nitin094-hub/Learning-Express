@@ -1,29 +1,6 @@
 // const fs = require("fs");
 const Tour = require("../models/tourModel");
 const ApiFeatures = require("../utils/apiFeatures");
-// const tours = JSON.parse(
-//   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-// );
-
-// exports.checkId = (req, res, next, val) => {
-//   if (parseInt(val) > tours.length) {
-//     return res.status(404).send({
-//       status: "fail",
-//       message: "Invalide Id",
-//     });
-//   }
-//   next();
-// };
-
-// exports.checkBody = (req, res, next) => {
-//   if (!("name" in req.body) || !("price" in req.body)) {
-//     return res.status(400).send({
-//       status: "error",
-//       message: "Request doesn't contain name or price property",
-//     });
-//   }
-//   next();
-// };
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = 5;
